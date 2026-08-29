@@ -87,7 +87,6 @@ export default function BrowseScreen() {
           )}
           contentContainerStyle={s.listContent}
           showsVerticalScrollIndicator={false}
-          scrollEnabled={!!(vendors && vendors.length > 0)}
           ListEmptyComponent={
             <View style={s.empty}>
               <Feather name="search" size={36} color={colors.mutedForeground} />
