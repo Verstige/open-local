@@ -4,7 +4,8 @@ import {
 } from "@/lib/api-client";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import * as Location from "expo-location";
 import { haversineDistanceMiles } from "@/utils/distance";
 import {
   ActivityIndicator,
@@ -49,6 +50,7 @@ export default function TheLocalsScreen() {
     longitude: number;
   } | null>(null);
   const [mapRadius, setMapRadius] = useState(25);
+  const [zipCenter, setZipCenter] = useState<{ latitude: number; longitude: number } | null>(null);
 
   const {
     data: vendors,
@@ -138,6 +140,22 @@ export default function TheLocalsScreen() {
     setRefreshing(false);
   };
 
+  // When user has a zip but GPS location is not yet available, geocode the zip to center the map
+  useEffect(() => {
+    if (userLocation || !user?.zip) return;
+    const geocode = async () => {
+      try {
+        const results = await Location.geocodeAsync(`${user.zip}, US`);
+        if (results.length > 0) {
+          setZipCenter({ latitude: results[0].latitude, longitude: results[0].longitude });
+        }
+      } catch {
+        // ignore — map stays on Florida center
+      }
+    };
+    geocode();
+  }, [user?.zip, userLocation]);
+
   const s = styles(colors, topPad, bottomPad);
 
   return (
@@ -151,6 +169,7 @@ export default function TheLocalsScreen() {
           emptyHint="No mapped locations yet"
           fullBleed
           showControls
+          initialCenter={zipCenter ?? undefined}
           onPinPress={(key) => {
             if (key.startsWith("v-")) router.push(`/vendor/${key.slice(2)}`);
           }}

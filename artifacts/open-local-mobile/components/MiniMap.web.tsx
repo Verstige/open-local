@@ -25,12 +25,14 @@ interface MiniMapProps {
   onPinPress?: (key: string) => void;
   onUserLocationChange?: (loc: { latitude: number; longitude: number } | null) => void;
   onRadiusChange?: (miles: number) => void;
+  initialCenter?: { latitude: number; longitude: number };
 }
 
 export function MiniMap({
   pins = [],
   height = 200,
   fullBleed = false,
+  initialCenter: _initialCenter,
 }: MiniMapProps) {
   const colors = useColors();
 

@@ -38,6 +38,8 @@ interface MiniMapProps {
   onPinPress?: (key: string) => void;
   onUserLocationChange?: (loc: { latitude: number; longitude: number } | null) => void;
   onRadiusChange?: (miles: number) => void;
+  /** Override initial center — use when GPS is unavailable but zip is known */
+  initialCenter?: { latitude: number; longitude: number };
 }
 
 const FLORIDA_CENTER = { latitude: 27.9944024, longitude: -81.7602544 };
@@ -57,6 +59,7 @@ export function MiniMap({
   onPinPress,
   onUserLocationChange,
   onRadiusChange,
+  initialCenter,
 }: MiniMapProps) {
   const colors = useColors();
   const [permission, requestPermission] = Location.useForegroundPermissions();
@@ -161,7 +164,7 @@ export function MiniMap({
   const { Circle, Marker, Callout } = Maps;
 
   const locationGranted = permission?.granted === true;
-  const center = userLocation ?? FLORIDA_CENTER;
+  const center = userLocation ?? initialCenter ?? FLORIDA_CENTER;
   const delta = deltaForRadius(radius);
 
   // When the user's location is known, only show pins within the chosen radius.
